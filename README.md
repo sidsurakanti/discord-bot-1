@@ -15,3 +15,7 @@ Hi, `izzy-bot` is my personal discord bot that I made with discord.py!
 `.members` - returns the number of members in the guild
 <br>
 `.source <command>` - shows the source code for `<command>`
+<br> 
+`.scores <date>` - shows the scores of the nba game on `<date>`
+<br>
+`.standings` - shows the current NBA standings
