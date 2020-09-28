@@ -18,4 +18,4 @@ Hi, `izzy-bot` is my personal discord bot that I made with discord.py!
 <br> 
 `.scores <date>` - shows the scores of the nba game on `<date>`
 <br>
-`.standings` - shows the current NBA standings
+<`.standings` - shows the current NBA standings>
