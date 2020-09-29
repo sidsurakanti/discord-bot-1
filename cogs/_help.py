@@ -15,8 +15,10 @@ class Help(commands.HelpCommand):
                               description=description,
                               color=discord.Color.dark_teal(),
                               timestamp=dt.utcnow())
-        embed.set_author(name=self.context.bot.user, icon_url=self.context.bot.user.avatar_url)
-        embed.set_footer(icon_url=self.context.author.avatar_url, text=f'Requested by: {self.context.author}')
+        embed.set_author(name=self.context.bot.user,
+                         icon_url=self.context.bot.user.avatar_url)
+        embed.set_footer(icon_url=self.context.author.avatar_url,
+                         text=f'Requested by: {self.context.author}')
 
         return embed
 
@@ -98,7 +100,8 @@ class Help(commands.HelpCommand):
             cog = command.cog
             return (no_cat if cog is None else cog.qualified_name)
 
-        filtered = await self.filter_commands(self.context.bot.commands, sort=True, key=get_category)
+        filtered = await self.filter_commands(self.context.bot.commands, sort=True,
+                                              key=get_category)
         for category, cmds in itertools.groupby(filtered, key=get_category):
             if cmds:
                 name = f"**{category}**"
@@ -113,14 +116,16 @@ class Help(commands.HelpCommand):
         desc = (group.short_doc) or ("```No specified command description.```")
         embed = self.embedify(title=title, description=desc)
 
-        filtered = await self.filter_commands(group.commands, sort=True, key=lambda c: c.name)
+        filtered = await self.filter_commands(group.commands, sort=True,
+                                              key=lambda c: c.name)
         if filtered:
             for command in filtered:
                 name = self.full_cog_path(command)
                 if isinstance(command, commands.Group):
                     name = 'Group: ' + name
 
-                value = (f"```fix\n{command.help}```") or ("*No specified command description.*")
+                value = (f"```fix\n{command.help}```") or (
+                    "*No specified command description.*")
                 embed.add_field(name=name, value=value, inline=False)
 
         if len(embed.fields) == 0:
@@ -131,7 +136,8 @@ class Help(commands.HelpCommand):
     async def send_cog_help(self, cog):
         """Help command for a cog"""
         title = cog.qualified_name
-        desc = (f"```fix\n{cog.description}```") or ("```No specified command description.```")
+        desc = (f"```fix\n{cog.description}```") or (
+            "```No specified command description.```")
         embed = self.embedify(title=title, description=desc)
 
         filtered = await self.filter_commands(cog.get_commands())
@@ -141,7 +147,8 @@ class Help(commands.HelpCommand):
                 if isinstance(command, commands.Group):
                     name = f"Group: {name}"
 
-                value = (f"```fix\n{command.help}```") or ("```No specified command description```")
+                value = (f"```fix\n{command.help}```") or (
+                    "```No specified command description```")
                 embed.add_field(name=name, value=value, inline=False)
 
         await self.context.send(embed=embed)
@@ -149,7 +156,8 @@ class Help(commands.HelpCommand):
     async def send_command_help(self, command):
         """Help command for a command"""
         title = self.full_command_path(command, include_prefix=True)
-        desc = (f"```fix\n{command.help}```") or ("```No specified command description```")
+        desc = (f"```fix\n{command.help}```") or (
+            "```No specified command description```")
         embed = self.embedify(title=title, description=desc)
 
         await self.context.send(embed=embed)
@@ -157,7 +165,9 @@ class Help(commands.HelpCommand):
     @staticmethod
     def list_to_string(lst) -> str:
         """Converts from list to string"""
-        return ', '.join([obj.name if isinstance(obj, discord.Role) else str(obj).replace('_', ' ') for obj in lst])
+        return ', '.join(
+            [obj.name if isinstance(obj, discord.Role) else str(obj).replace('_', ' ') for
+             obj in lst])
 
 
 class NewHelp(commands.Cog, name="Help Command"):

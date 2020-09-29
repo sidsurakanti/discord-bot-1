@@ -7,6 +7,7 @@ from discord.ext import commands
 
 from utils import spoti
 
+
 class Commands(commands.Cog, name="Commands"):
     def __init__(self, bot):
         self.bot = bot
@@ -32,14 +33,16 @@ class Commands(commands.Cog, name="Commands"):
 
                 except Exception as e:  # if there's an error while loading cogs
                     print(e)
-                    await ctx.send(embed=discord.Embed(title="***Error while loading cogs.***",
-                                                       color=discord.Color.red()))
+                    await ctx.send(
+                        embed=discord.Embed(title="***Error while loading cogs.***",
+                                            color=discord.Color.red()))
                     break
 
         else:  # if all cogs were loaded successfully
             print('Reloaded cogs successfully')
-            await ctx.send(embed=discord.Embed(title="***Reloaded all cogs successfully***",
-                                               color=discord.Color.green()))
+            await ctx.send(
+                embed=discord.Embed(title="***Reloaded all cogs successfully***",
+                                    color=discord.Color.green()))
 
     @commands.command(aliases=['av', 'pfp'])
     async def avatar(self, ctx, *, member: discord.Member = None):
@@ -61,23 +64,29 @@ class Commands(commands.Cog, name="Commands"):
         """Returns the discord info of <member>"""
         # defining values
         member = member or ctx.author  # sets member to <ctx.author> if <member> is None
-        joined_on = member.joined_at.strftime("%a, %b, %Y  %I:%M %p")  # the time when <member> joined the server
-        created_at = member.created_at.strftime("%a, %b, %Y  %I:%M %p")  # the time when <member>'s account was created
-        member_roles = [role for role in member.roles if role.name != '@everyone']  # roles <member> has except @everyone role
+        joined_on = member.joined_at.strftime(
+            "%a, %b, %Y  %I:%M %p")  # the time when <member> joined the server
+        created_at = member.created_at.strftime(
+            "%a, %b, %Y  %I:%M %p")  # the time when <member>'s account was created
+        member_roles = [role for role in member.roles if
+                        role.name != '@everyone']  # roles <member> has except @everyone role
 
         # Embed
         # initializing new embed
         embd = discord.Embed(color=discord.Color.dark_blue(),
                              timestamp=dt.utcnow())
 
-        embd.set_author(name=member.display_name, icon_url=member.avatar_url)  # setting author
+        embd.set_author(name=member.display_name,
+                        icon_url=member.avatar_url)  # setting author
         embd.set_thumbnail(url=member.avatar_url)  # setting thumbnail
         embd.set_footer(text=f"Requested by {ctx.author}")  # setting footer
         embd.add_field(name="Joined on", value=joined_on)  # new field
         embd.add_field(name="Registered on", value=created_at)  # new field
 
         if member_roles:  # if member has roles
-            embd.add_field(name=f"Roles [{len(member_roles)}]", value=" ".join([role.mention for role in member_roles]), inline=False)
+            embd.add_field(name=f"Roles [{len(member_roles)}]",
+                           value=" ".join([role.mention for role in member_roles]),
+                           inline=False)
         else:  # if member doesn't have any roles
             embd.add_field(name=f"Roles [0]", value="None", inline=False)
 
@@ -98,7 +107,8 @@ class Commands(commands.Cog, name="Commands"):
         # looping thru all of <members> activities
         for activity in member.activities:
             if isinstance(activity, Spotify):  # if <activity> is of type Spotify
-                mins, secs = divmod(activity.duration.seconds, 60)  # getting the duration of <activity> in MM:SS format
+                mins, secs = divmod(activity.duration.seconds,
+                                    60)  # getting the duration of <activity> in MM:SS format
                 if secs < 10:  # adds a zero before <secs> so it's fits MM:SS format
                     secs = f"0{secs}"
 
@@ -106,9 +116,11 @@ class Commands(commands.Cog, name="Commands"):
                 embd = discord.Embed(color=discord.Color.green(),
                                      timestamp=dt.utcnow())
 
-                embd.set_author(name=f"{member.display_name}", icon_url=member.avatar_url)  # setting author
+                embd.set_author(name=f"{member.display_name}",
+                                icon_url=member.avatar_url)  # setting author
                 embd.set_footer(text=f"Requested by {member}")
-                embd.set_image(url=activity.album_cover_url)  # setting image as album cover for <activity>
+                embd.set_image(
+                    url=activity.album_cover_url)  # setting image as album cover for <activity>
 
                 # new field
                 embd.add_field(name=f"**{activity.title}**",
@@ -131,7 +143,8 @@ class Commands(commands.Cog, name="Commands"):
 
         else:
             # initializing new embed
-            embd = discord.Embed(title=f"You are not listening to anything at the moment",  # title for the embed
+            embd = discord.Embed(title=f"You are not listening to anything at the moment",
+                                 # title for the embed
                                  color=discord.Color.dark_purple(),  # color for the embed
                                  timestamp=dt.utcnow())
 
@@ -144,7 +157,8 @@ class Commands(commands.Cog, name="Commands"):
         embd = discord.Embed(title=title, description=desc,
                              color=discord.Color.blue(),
                              timestamp=dt.utcnow())
-        embd.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)  # setting footer
+        embd.set_footer(text=f"Requested by {ctx.author}",
+                        icon_url=ctx.author.avatar_url)  # setting footer
 
         await ctx.message.delete()  # deleting command invocation message
         await ctx.send(embed=embd)
@@ -152,10 +166,11 @@ class Commands(commands.Cog, name="Commands"):
     @commands.command(aliases=['member_count'])
     async def members(self, ctx):
         """Returns the number of members in the guild"""
-        members = [member for member in self.bot.guild.members if not member.bot]  # list of all the members in the server
+        members = [member for member in self.bot.guild.members if
+                   not member.bot]  # list of all the members in the server
         # initializing embed
         embd = discord.Embed(title=f"Members: {len(members)}",
-                                   color=discord.Color.dark_magenta())
+                             color=discord.Color.dark_magenta())
         await ctx.send(embed=embd)
 
 

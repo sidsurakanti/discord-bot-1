@@ -1,7 +1,7 @@
+from inspect import getsource as gs
+
 import discord
 from discord.ext import commands
-
-from inspect import getsource as gs
 
 
 class Source(commands.Cog, name="Source"):
@@ -29,7 +29,8 @@ class Source(commands.Cog, name="Source"):
     @commands.command()
     async def source(self, ctx, *, command: str = None):
         """Source code for <command>"""
-        error_embd = discord.Embed(title="Please enter a command", color=discord.Color.red())
+        error_embd = discord.Embed(title="Please enter a command",
+                                   color=discord.Color.red())
         error_embd2 = discord.Embed(title="Can't find command", color=discord.Color.red())
         if command is None:  # if user didn't enter a command
             return await ctx.send(embed=error_embd)
