@@ -1,67 +1,91 @@
+import os
+import datetime as dt 
+
 import discord
-from discord import Embed
-from discord import Permissions
 from discord.ext import commands
-from discord.utils import get
+from discord import Embed
+from discord.ext.commands import ExtensionNotLoaded, ExtensionNotFound, ExtensionAlreadyLoaded
 
 
-class Moderation(commands.Cog, name="Moderation"):
-    def __init__(self, bot):
-        self.bot = bot
+class Moderation(commands.Cog):
+	def __init__(self, bot):
+		self.bot = bot
+	
+	def cog_check(self, ctx):
+		if ctx.guild is None:
+			return False
+		else:
+			return True
 
-    def cog_check(self, ctx):
-        if ctx.guild is None:
-            return False
-        else:
-            return True
+	@commands.command()
+	@commands.has_permissions(administrator=True)
+	async def reload(self, ctx):
+		"""Reloads all extensions/cogs"""
+		for cog in os.listdir("cogs"):
+			if cog.endswith(".py"):
+				try:
+					self.bot.reload_extension(f"cogs.{cog[:-3]}")
+				except ExtensionNotLoaded:
+					self.bot.load_extension(f"cogs.{cog[:-3]}")
 
-    @commands.command(aliases=['purge'])
-    @commands.has_permissions(manage_messages=True)
-    async def clear(self, ctx, num: int = 5):
-        """Purge's last <num> messages"""
-        num = 100 if num > 100 else num  # sets <num> to 100 if <num> is greater than 100
-        await ctx.message.delete()  # deletes command invocation message
-        await ctx.channel.purge(limit=num)
+		embd = Embed(title="Reloaded Cogs",
+					 color=0xFFC087,
+					 timestamp=dt.datetime.utcnow())
+		embd.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+		await ctx.send(embed=embd)
 
-    @commands.command()
-    @commands.has_permissions(kick_members=True)
-    async def mute(self, ctx, member: discord.Member, *, reason: str = None):
-        """Mutes <member>"""
-        role = get(ctx.guild.roles, name="Muted")  # gets role called 'Muted' in guild
-        embd = Embed(title=f":white_check_mark:  **Muted {member}**",
-                     color=discord.Color.green())  # initializes new embed and sets title
+	@commands.command()
+	@commands.has_permissions(administrator=True)
+	async def unload(self, ctx, name):
+		"""Unloads specified extension/cog"""
+		color = 0xFFC087
+		title = "Error"
 
-        if role is None:  # creates a new role called 'Muted' and sets <role> to the new role if there isn't already a role called 'Muted'
-            role = await ctx.guild.create_role(name="Muted",
-                                               permissions=Permissions.general())
+		for cog in os.listdir("cogs"):
+			if cog.endswith(".py") and cog.startswith(name):
+				try: 
+					self.bot.unload_extension(f"cogs.{cog[:-3]}")
+					title = f"Unloaded `{name.title()}` cog"
+					break
+				except ExtensionNotLoaded:
+					title = "Extension was already unloaded"
+					break
+		else:	
+			title = "Extension not found"
+			color = 0xFF564D
 
-        # loops thru all the channels in the guild and sets send_message permission for <role> to False
-        for channel in ctx.guild.channels:
-            await channel.set_permissions(role, send_messages=False, read_messages=True,
-                                          read_message_history=True)
+		embd = Embed(title=title,
+					 color=color,
+					 timestamp=dt.datetime.utcnow())
+		embd.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+		await ctx.send(embed=embd)
 
-        await ctx.message.delete()  # deletes the command invocation message
-        await member.add_roles(role, reason=reason)  # adds <role> to <member>
-        await ctx.send(embed=embd)
+	@commands.command()
+	@commands.has_permissions(administrator=True)
+	async def load(self, ctx, name):
+		"""Loads specified extension/cog"""
+		color = 0xFFC087
 
-    @commands.command()
-    @commands.has_permissions(administrator=True)
-    async def unmute(self, ctx, member: discord.Member, *, reason=None):
-        """Unmutes <member> """
-        role = get(member.guild.roles,
-                   name='Muted')  # gets the role object for the role with the name of 'Muted'
-        await member.remove_roles(role,
-                                  reason=reason)  # removes the 'Muted' role from user
-        embd = Embed(title=f":white_check_mark:  Unmuted {member} ",
-                     color=discord.Color.green())  # initializes new embed and sets title
-        await ctx.message.delete()  # deletes command invocation message
-        await ctx.send(embed=embd)
+		for cog in os.listdir("cogs"):
+			if cog.endswith(".py") and cog.startswith(name):
+				try:
+					self.bot.load_extension(f"cogs.{cog[:-3]}")
+					title = f"Loaded `{name.title()}`"
+					break
+				except ExtensionAlreadyLoaded:
+					title = f"Extension was already loaded"
+					break
+		else:
+			title = "Extension not found"
+			color = 0xFF564D
 
-    @commands.command(hidden=True)
-    @commands.has_permissions(ban_members=True)
-    async def ban(self, ctx):
-        pass
+		embd = Embed(title=title,
+					 color=color,
+					 timestamp=dt.datetime.utcnow())
+		embd.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
+		await ctx.send(embed=embd)
 
 
 def setup(bot):
     bot.add_cog(Moderation(bot=bot))
+		
