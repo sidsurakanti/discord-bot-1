@@ -1,1 +1,0 @@
-TOKEN = "<BOT TOKEN HERE>"
