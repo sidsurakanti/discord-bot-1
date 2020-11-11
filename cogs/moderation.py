@@ -1,16 +1,15 @@
+import datetime as dt
 import os
-import datetime as dt 
 
-import discord
-from discord.ext import commands
 from discord import Embed
-from discord.ext.commands import ExtensionNotLoaded, ExtensionNotFound, ExtensionAlreadyLoaded
+from discord.ext import commands
+from discord.ext.commands import ExtensionNotLoaded, ExtensionAlreadyLoaded
 
 
 class Moderation(commands.Cog):
 	def __init__(self, bot):
 		self.bot = bot
-	
+
 	def cog_check(self, ctx):
 		if ctx.guild is None:
 			return False
@@ -29,8 +28,8 @@ class Moderation(commands.Cog):
 					self.bot.load_extension(f"cogs.{cog[:-3]}")
 
 		embd = Embed(title="Reloaded Cogs",
-					 color=0xFFC087,
-					 timestamp=dt.datetime.utcnow())
+		             color=0xFFC087,
+		             timestamp=dt.datetime.utcnow())
 		embd.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
 		await ctx.send(embed=embd)
 
@@ -39,24 +38,23 @@ class Moderation(commands.Cog):
 	async def unload(self, ctx, name):
 		"""Unloads specified extension/cog"""
 		color = 0xFFC087
-		title = "Error"
 
 		for cog in os.listdir("cogs"):
 			if cog.endswith(".py") and cog.startswith(name):
-				try: 
+				try:
 					self.bot.unload_extension(f"cogs.{cog[:-3]}")
 					title = f"Unloaded `{name.title()}` cog"
 					break
 				except ExtensionNotLoaded:
 					title = "Extension was already unloaded"
 					break
-		else:	
+		else:
 			title = "Extension not found"
 			color = 0xFF564D
 
 		embd = Embed(title=title,
-					 color=color,
-					 timestamp=dt.datetime.utcnow())
+		             color=color,
+		             timestamp=dt.datetime.utcnow())
 		embd.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
 		await ctx.send(embed=embd)
 
@@ -80,12 +78,11 @@ class Moderation(commands.Cog):
 			color = 0xFF564D
 
 		embd = Embed(title=title,
-					 color=color,
-					 timestamp=dt.datetime.utcnow())
+		             color=color,
+		             timestamp=dt.datetime.utcnow())
 		embd.set_footer(text=f"Requested by {ctx.author}", icon_url=ctx.author.avatar_url)
 		await ctx.send(embed=embd)
 
 
 def setup(bot):
-    bot.add_cog(Moderation(bot=bot))
-		
+	bot.add_cog(Moderation(bot=bot))

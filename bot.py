@@ -1,10 +1,10 @@
-import os
 import asyncio
 import datetime as dt
+import os
 
 import discord
-from discord.ext import commands
 from discord import Embed
+from discord.ext import commands
 from discord.ext.commands import MemberNotFound
 
 from config import *
@@ -14,27 +14,28 @@ intents = discord.Intents.default()
 intents.members = True
 
 
-class Cloud(commands.Bot):
-	def __init__(self, **kwargs): 
-		super().__init__(command_prefix=kwargs.pop("command_prefix", ("-")),
-										 case_insensitive=True, intents=intents, **kwargs)
+class Bot(commands.Bot):
+	def __init__(self, **kwargs):
+		super().__init__(command_prefix=kwargs.pop("command_prefix", "-"),
+		                 case_insensitive=True, intents=intents, **kwargs)
 
 	async def on_ready(self):
 		"""after bot is logged on"""
 		await self.wait_until_ready()
 		await self.change_presence(status=discord.Status.idle,
-                               activity=discord.Activity(type=discord.ActivityType.playing, name=f'{self.command_prefix}help'))
+		                           activity=discord.Activity(type=discord.ActivityType.playing,
+		                                                     name=f'{self.command_prefix}help'))
 
 		# loads cogs
 		for cog in os.listdir("cogs"):
 			if cog.endswith(".py"):
 				self.load_extension(f"cogs.{cog[:-3]}")
 
-		self.load_extension("jishaku") 
+		self.load_extension("jishaku")
 		print(f"{self.user.name} is ready!")
 
 	async def on_message(self, message):
-		if message.author.bot: 
+		if message.author.bot:
 			return
 
 		command_prefix = f"`{self.command_prefix}`"
@@ -42,13 +43,14 @@ class Cloud(commands.Bot):
 			command_prefix = ", ".join([f"`{i}`" for i in self.command_prefix])
 
 		if f"<@!{self.user.id}>" == message.content:
+			invite_link = discord.utils.oauth_url(self.user.id, permissions=discord.Permissions(administrator=True))
 			embd = Embed(color=0xFF9D8C,
-									 timestamp=dt.datetime.utcnow())
+			             timestamp=dt.datetime.utcnow())
 			embd.add_field(name="Name", value=f"{self.user.name} (`{self.user}`)", inline=False)
 			embd.add_field(name="Details", value=f'Prefix(s): {command_prefix}\nAuthor: `izzy#2859`')
 			embd.add_field(name="\u200b",
-										 value=f"[**Invite Link**]({discord.utils.oauth_url(self.user.id, permissions=discord.Permissions(administrator=True))})",
-										 inline=False)
+			               value=f"[**Invite Link**]({invite_link})",
+			               inline=False)
 			embd.set_thumbnail(url=self.user.avatar_url)
 			await message.channel.send(embed=embd)
 
@@ -66,8 +68,8 @@ class Cloud(commands.Bot):
 
 		error = getattr(exception, 'original', exception)
 		embd = Embed(title="Error",
-								 color=0xDB594E,
-								 timestamp=dt.datetime.utcnow())
+		             color=0xDB594E,
+		             timestamp=dt.datetime.utcnow())
 
 		if isinstance(error, MemberNotFound):
 			embd.description = "Member not found"
@@ -76,15 +78,15 @@ class Cloud(commands.Bot):
 
 		print(exception)
 
-	@classmethod 
-	async def setup(cls): 
+	@classmethod
+	async def setup(cls):
 		bot = cls()
-		try: 
+		try:
 			await bot.start(BOT_TOKEN)
 		except KeyboardInterrupt:
 			await bot.close()
 
 
 if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(Cloud.setup())
+	loop = asyncio.get_event_loop()
+	loop.run_until_complete(Bot.setup())
